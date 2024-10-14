@@ -21,6 +21,10 @@ app.post("/api/pages/add", async (req, res) => {
   const { title, icon, color, form, link } = req.body;
 
   try {
+    const existingPage = await Page.findOne({ link });
+    if (existingPage) {
+      return res.status(409).json({ message: "Link is already used!" });
+    }
     const newPage = new Page({ title, icon, color, form, link });
     await newPage.save();
     res.status(201).json({ message: "Page added successfully", page: newPage });
@@ -29,6 +33,7 @@ app.post("/api/pages/add", async (req, res) => {
     res.status(500).json({ message: "Error adding page", error });
   }
 });
+
 
 app.put("/api/pages/update/:id", async (req, res) => {
   const { id } = req.params;
